@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bro Code Dictionary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000;
+            --white: #fff;
+            --gray: #f5f5f5;
+            --dark-gray: #444;
+            --accent: #ff6b35;
+            --light-accent: #ffe0d6;
+            --font-sans: "Poppins", sans-serif;
+            --font-serif: "Playfair Display", serif;
+            --space-xs: 8px;
+            --space-s: 12px;
+            --space-m: 20px;
+            --space-l: 36px;
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+        }
+        
+        html, body {
+            background: var(--white);
+            color: var(--black);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header.site-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-m);
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .brand h1 {
+            margin: 0;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        
+        .brand .tagline {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        
+        .auth-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-s);
+            align-items: center;
+            margin-top: var(--space-s);
+        }
+        
+        .auth-section input {
+            padding: 8px 12px;
+            border: 1px solid var(--dark-gray);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+        
+        .auth-section button {
+            padding: 8px 16px;
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: var(--space-l) auto;
+            padding: 0 var(--space-m);
+            flex: 1;
+            width: 100%;
+        }
+        
+        .intro {
+            margin-bottom: var(--space-l);
+            text-align: center;
+        }
+        
+        .intro h2 {
+            margin: 0 0 var(--space-s) 0;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        
+        .intro p {
+            margin: 0;
+            color: var(--dark-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: var(--space-l);
+            position: relative;
+        }
+        
+        .search input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--black);
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 1rem;
+            min-width: 0;
+        }
+        
+        .search:after {
+            content: "🔍";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+        
+        .dictionary {
+            display: grid;
+            gap: var(--space-m);
+            grid-template-columns: 1fr;
+        }
+        
+        dl.entry {
+            border: 2px solid var(--black);
+            border-radius: var(--radius);
+            padding: var(--space-m);
+            background: var(--white);
+            margin: 0;
+            transition: var(--transition);
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        dt {
+            margin: 0;
+        }
+        
+        dt button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background: none;
+            border: none;
+            font-weight: 700;
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
+            text-align: left;
+            transition: var(--transition);
+        }
+        
+        dt button:hover {
+            color: var(--accent);
+        }
+        
+        dt button span.arrow {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        dt button[aria-expanded="true"] span.arrow {
+            transform: rotate(90deg);
+            color: var(--accent);
+        }
+        
+        dd {
+            margin: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+        }
+        
+        dd.open {
+            opacity: 1;
+            margin-top: var(--space-m);
+            max-height: 500px;
+        }
+        
+        footer {
+            margin-top: auto;
+            padding: var(--space-m);
+            border-top: 2px solid var(--black);
+            text-align: center;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        
+        .highlight {
+            background-color: var(--light-accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .add-term {
+            margin-top: var(--space-l);
+            padding: var(--space-m);
+            border: 2px dashed var(--black);
+            border-radius: var(--radius);
+            background: var(--gray);
+            display: none;
+        }
+        
+        .add-term h3 {
+            margin-top: 0;
+            font-family: var(--font-serif);
+        }
+        
+        .add-term form {
+            display: grid;
+            gap: var(--space-s);
+        }
+        
+        .add-term input, .add-term textarea {
+            padding: var(--space-s);
+            border: 1px solid var(--dark-gray);
+            border-radius: var(--radius);
+            font-family: var(--font-sans);
+            resize: vertical;
+        }
+        
+        .add-term button {
+            padding: var(--space-s);
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .add-term button:hover {
+            background: #e55a2b;
+        }
+        
+        .login-error {
+            color: #d32f2f;
+            font-size: 0.9rem;
+            margin-top: var(--space-xs);
+            display: none;
+            width: 100%;
+            text-align: center;
+        }
+        
+        /* Responsive design */
+        @media (min-width: 480px) {
+            .auth-section {
+                margin-top: 0;
+                flex-wrap: nowrap;
+            }
+        }
+        
+        @media (min-width: 600px) {
+            .dictionary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            header.site-header {
+                flex-wrap: nowrap;
+            }
+            
+            .brand h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (min-width: 900px) {
+            .dictionary {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .intro h2 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 359px) {
+            .auth-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .auth-section input, .auth-section button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <h1>Bro Code Dictionary</h1>
+            <div class="tagline">The unspoken lingo, spelled out.</div>
+        </div>
+        <div class="auth-section">
+            <input type="text" id="username" placeholder="Username" aria-label="Username">
+            <input type="password" id="password" placeholder="Password" aria-label="Password">
+            <button id="login-btn">Login</button>
+            <div class="login-error" id="login-error">Invalid credentials. Please try again.</div>
+        </div>
+    </header>
+    
+    <main>
+        <section class="intro">
+            <h2>Quick definitions</h2>
+            <p>Click on any term to reveal its meaning.</p>
+        </section>
+        
+        <div class="search">
+            <input type="search" id="search" placeholder="Search terms..." aria-label="Search dictionary">
+        </div>
+        
+        <section class="dictionary" id="dict">
+            <dl class="entry" data-term="did we">
+                <dt>
+                    <button aria-expanded="false" aria-controls="def1">"did we" <span class="arrow">→</span></button>
+                </dt>
+                <dd id="def1">
+                    <p><span class="highlight">Exact meaning:</span> <strong>we did</strong>.</p>
+                    <p><span class="highlight">Example:</span></p>
+                    <p>Bro 1: "Yo, did we just crush that game?"<br>
+                    Bro 2: "Did we." (translation: <strong>we did</strong>)</p>
+                </dd>
+            </dl>
+            
+            <dl class="entry" data-term="didnt we">
+                <dt>
+                    <button aria-expanded="false" aria-controls="def2">"didnt we" <span class="arrow">→</span></button>
+                </dt>
+                <dd id="def2">
+                    <p><span class="highlight">Exact meaning:</span> <strong>we didn't</strong>.</p>
+                    <p><span class="highlight">Example:</span></p>
+                    <p>Bro 1: "Yo, didn't we hit the gym yesterday?"<br>
+                    Bro 2: "Didn't we." (translation: <strong>we didn't</strong>)</p>
+                </dd>
+            </dl>
+        </section>
+        
+        <section class="add-term" id="add-term-section">
+            <h3>Add a New Term</h3>
+            <form id="add-term-form">
+                <input type="text" id="term" placeholder="Term (e.g., 'did we')" required>
+                <input type="text" id="meaning" placeholder="Exact meaning (e.g., 'we did')" required>
+                <textarea id="example" placeholder="Example conversation" rows="3" required></textarea>
+                <button type="submit">Add Term</button>
+            </form>
+        </section>
+    </main>
+    
+    <footer>
+        &copy; <span id="year"></span> Bro Code Dictionary @atif.a6z
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // Set your username and password here
+        const ADMIN_USERNAME = "admin";
+        const ADMIN_PASSWORD = "brocode123";
+
+        // Check if user is logged in
+        let isLoggedIn = false;
+
+        // DOM elements
+        const loginBtn = document.getElementById("login-btn");
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const loginError = document.getElementById("login-error");
+        const addTermSection = document.getElementById("add-term-section");
+        const searchInput = document.getElementById("search");
+        const dictionary = document.getElementById("dict");
+        const form = document.getElementById("add-term-form");
+
+        // Login functionality
+        loginBtn.addEventListener("click", function() {
+            if (isLoggedIn) {
+                // Logout
+                isLoggedIn = false;
+                addTermSection.style.display = "none";
+                usernameInput.disabled = false;
+                passwordInput.disabled = false;
+                this.textContent = "Login";
+                usernameInput.value = "";
+                passwordInput.value = "";
+                loginError.style.display = "none";
+                return;
+            }
+            
+            // Login attempt
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                isLoggedIn = true;
+                addTermSection.style.display = "block";
+                loginError.style.display = "none";
+                
+                // Clear password field
+                passwordInput.value = "";
+                
+                // Update UI
+                usernameInput.disabled = true;
+                passwordInput.disabled = true;
+                this.textContent = "Logout";
+            } else {
+                loginError.style.display = "block";
+            }
+        });
+
+        // Allow login with Enter key
+        passwordInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                loginBtn.click();
+            }
+        });
+
+        // Initialize entries with animation
+        const entries = document.querySelectorAll(".entry");
+        let delay = 0;
+        entries.forEach(entry => {
+            entry.style.animationDelay = delay + "ms";
+            delay += 100;
+            setTimeout(() => {
+                entry.style.opacity = "1";
+                entry.style.transform = "translateY(0)";
+            }, delay);
+        });
+
+        // Independent toggle for each entry
+        document.querySelectorAll(".entry button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // Get the specific definition for this button only
+                const defId = btn.getAttribute("aria-controls");
+                const def = document.getElementById(defId);
+                const isExpanded = btn.getAttribute("aria-expanded") === "true";
+                
+                // Toggle the clicked definition
+                if (!isExpanded) {
+                    btn.setAttribute("aria-expanded", "true");
+                    def.classList.add("open");
+                    def.style.maxHeight = def.scrollHeight + "px";
+                } else {
+                    btn.setAttribute("aria-expanded", "false");
+                    def.style.maxHeight = "0";
+                    setTimeout(() => {
+                        def.classList.remove("open");
+                    }, 300);
+                }
+            });
+        });
+
+        // Search filter
+        searchInput.addEventListener("input", () => {
+            const query = searchInput.value.toLowerCase();
+            entries.forEach(entry => {
+                const term = entry.dataset.term.toLowerCase();
+                if (term.includes(query) || query === "") {
+                    entry.style.display = "grid";
+                } else {
+                    entry.style.display = "none";
+                }
+            });
+        });
+
+        // Add new term functionality
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            if (!isLoggedIn) return;
+            
+            const term = document.getElementById("term").value.trim();
+            const meaning = document.getElementById("meaning").value.trim();
+            const example = document.getElementById("example").value.trim();
+            
+            if (term && meaning && example) {
+                // Create a unique ID for the new definition
+                const defId = "def" + (document.querySelectorAll(".entry").length + 1);
+                
+                // Create the new entry HTML
+                const newEntry = document.createElement("dl");
+                newEntry.className = "entry";
+                newEntry.dataset.term = term.toLowerCase();
+                newEntry.innerHTML = `
+                    <dt>
+                        <button aria-expanded="false" aria-controls="${defId}">"${term}" <span class="arrow">→</span></button>
+                    </dt>
+                    <dd id="${defId}">
+                        <p><span class="highlight">Exact meaning:</span> <strong>${meaning}</strong>.</p>
+                        <p><span class="highlight">Example:</span></p>
+                        <p>${example}</p>
+                    </dd>
+                `;
+                
+                // Add to the dictionary
+                dictionary.appendChild(newEntry);
+                
+                // Add animation
+                newEntry.style.animation = "fadeIn 0.5s ease forwards";
+                
+                // Add click event to the new button
+                const newButton = newEntry.querySelector("button");
+                newButton.addEventListener("click", function() {
+                    const defId = this.getAttribute("aria-controls");
+                    const def = document.getElementById(defId);
+                    const isExpanded = this.getAttribute("aria-expanded") === "true";
+                    
+                    if (!isExpanded) {
+                        this.setAttribute("aria-expanded", "true");
+                        def.classList.add("open");
+                        def.style.maxHeight = def.scrollHeight + "px";
+                    } else {
+                        this.setAttribute("aria-expanded", "false");
+                        def.style.maxHeight = "0";
+                        setTimeout(() => {
+                            def.classList.remove("open");
+                        }, 300);
+                    }
+                });
+                
+                // Clear the form
+                form.reset();
+            }
+        });
+
+        // Handle responsive behavior on window resize
+        window.addEventListener('resize', function() {
+            // Close any open definitions on small screens when resizing
+            if (window.innerWidth < 600) {
+                document.querySelectorAll('.entry dd.open').forEach(dd => {
+                    dd.style.maxHeight = '0';
+                    dd.classList.remove('open');
+                    dd.previousElementSibling.querySelector('button').setAttribute('aria-expanded', 'false');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
